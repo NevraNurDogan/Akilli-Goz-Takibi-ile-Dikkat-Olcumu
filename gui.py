@@ -1,7 +1,7 @@
 import smtplib
 import tkinter as tk
 from tkinter import messagebox
-from database import setup_database, get_user_data, get_all_users
+from database import setup_database, get_user_data, get_all_users, get_user_sessions
 from detection import Detector
 from threading import Thread
 import sqlite3
@@ -207,18 +207,49 @@ class App:
             self.detector.stop()
             messagebox.showinfo("Durdu", "Takip durduruldu.")
 
-    def show_data(self):#Kullanıcının kayıtlı verilerini gösterir.
-        blink_rows, distance_rows = get_user_data(self.current_user_id)
+    def show_data(self):  # Kullanıcının kayıtlı verilerini gösterir.
+        data = get_user_data(self.current_user_id)
+        session_rows = get_user_sessions(self.current_user_id)
+
         data_window = tk.Toplevel(self.root)
-        data_window.title("Veri Kayıt")
-        text_area = tk.Text(data_window, width=60, height=30)
+        data_window.title("Veri Kayıtları")
+        text_area = tk.Text(data_window, width=70, height=35)
         text_area.pack()
-        text_area.insert(tk.END, "Göz Kırpma:\n")
-        for row in blink_rows:
+
+        # Göz Kırpma
+        text_area.insert(tk.END, "🔹 Göz Kırpma:\n")
+        for row in data["blinks"]:
             text_area.insert(tk.END, f"{row[2]} - Blinks: {row[3]}\n")
-        text_area.insert(tk.END, "\nMesafe:\n")
-        for row in distance_rows:
+
+        # Mesafe
+        text_area.insert(tk.END, "\n🔹 Mesafe:\n")
+        for row in data["distances"]:
             text_area.insert(tk.END, f"{row[2]} - Mesafe: {row[3]:.1f} cm\n")
+
+        # Baş Pozisyonları
+        text_area.insert(tk.END, "\n🔹 Baş Pozisyonları (Yaw/Pitch/Roll açısı):\n")
+        for row in data["head_positions"]:
+            text_area.insert(tk.END, f"{row[2]} - Yön: {row[3]}\n")
+
+        # Göz Yönleri
+        text_area.insert(tk.END, "\n🔹 Göz Yönleri:\n")
+        for row in data["eye_directions"]:
+            text_area.insert(tk.END, f"{row[2]} - Yön: {row[3]}\n")
+
+        # Fixation (Göz Açık Kalma Süresi)
+        text_area.insert(tk.END, "\n🔹 Göz Açık Kalma Süresi (Fixation):\n")
+        for row in data["eye_open_times"]:
+            text_area.insert(tk.END, f"{row[2]} - Süre: {row[3]:.2f} sn\n")
+
+        # Oturum Süreleri
+        text_area.insert(tk.END, "\n🔹 Oturum Süreleri:\n")
+        for row in session_rows:
+            text_area.insert(tk.END, f"{row[2]} - Süre: {row[3]:.1f} sn\n")
+
+        # Dikkat Dağınıklığı Olayları
+        text_area.insert(tk.END, "\n🔹 Dikkat Dağınıklığı Olayları:\n")
+        for row in data["distractions"]:
+            text_area.insert(tk.END, f"{row[2]} - Dikkat Dağınıklığı Algılandı\n")
 
     def admin_user_selection(self):#Admin kullanıcı için kullanıcı seçme ekranı:
         for widget in self.root.winfo_children():

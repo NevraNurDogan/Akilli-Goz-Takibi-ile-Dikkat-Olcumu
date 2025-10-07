@@ -6,9 +6,5 @@ if __name__ == "__main__":
     app = App(root)
     root.mainloop()
 
-    # nevra admin şifresi TAUpMYKC
+    # nevra admin şifresi PC#t5bz2
     # betül user  şifresi Bd1234!
-    # esra user   şifresi HM9cJ@gE
-    # melisa user şifresi kEW2v!jA
-    # zeynep user sifresi PqEYlr6J
-    # büşra user   şifresi yjN@WxL6
